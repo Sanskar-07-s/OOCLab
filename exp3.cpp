@@ -1,8 +1,7 @@
-#include <iostream>
-#include <string>
+#include<iostream>
+#include<string>
 using namespace std;
 
-// Base class
 class Account {
 protected:
     string accountHolder;
@@ -16,100 +15,80 @@ public:
         balance = initBalance;
     }
 
-    virtual void deposit(double amount) {
+    void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
-            cout << "Deposited: Rs. " << amount << ". New Balance: Rs. " << balance << endl;
+            cout << "Deposited: " << amount << ". New Balance: " << balance << endl;
         } else {
             cout << "Invalid deposit amount!" << endl;
         }
     }
 
-    virtual void withdraw(double amount) {
+    void withdraw(double amount) {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
-            cout << "Withdrawn: Rs. " << amount << ". Remaining Balance: Rs. " << balance << endl;
+            cout << "Withdrawn: " << amount << ". Remaining Balance: " << balance << endl;
         } else {
-            cout << "Insufficient balance or invalid amount!" << endl;
+            cout << "Insufficient balance!" << endl;
         }
     }
 
-    virtual void display() const {
-        cout << "\n--- Account Details ---" << endl;
+    void display() {
         cout << "Account Holder: " << accountHolder << endl;
         cout << "Account Number: " << accountNumber << endl;
-        cout << "Current Balance: Rs. " << balance << endl;
+        cout << "Balance: " << balance << endl;
     }
-
-    virtual ~Account() {}
 };
 
-// Derived class for Savings Account
 class SavingAccount : public Account {
 private:
-    double interestRate; // Annual interest percentage
+    double interestRate;
 
 public:
     SavingAccount(string name, int accNo, double initBalance, double rate)
-        : Account(name, accNo, initBalance), interestRate(rate) {}
+        : Account(name, accNo, initBalance) {
+        interestRate = rate;
+    }
 
     void calculateInterest() {
         double interest = (balance * interestRate) / 100.0;
         balance += interest;
-        cout << "Interest of Rs. " << interest << " credited at " << interestRate 
-             << "%. Updated Balance: Rs. " << balance << endl;
-    }
-
-    void display() const {
-        Account::display();
-        cout << "Account Type: Savings Account" << endl;
-        cout << "Interest Rate: " << interestRate << "%" << endl;
+        cout << "Interest Added: " << interest << ". Updated Balance: " << balance << endl;
     }
 };
 
-// Derived class for Checking Account
 class CheckingAccount : public Account {
 private:
-    double overdraftLimit;
-    double transactionFee;
+    double fee;
 
 public:
-    CheckingAccount(string name, int accNo, double initBalance, double limit, double fee)
-        : Account(name, accNo, initBalance), overdraftLimit(limit), transactionFee(fee) {}
-
-    void withdraw(double amount) {
-        double totalDebit = amount + transactionFee;
-        if (totalDebit > 0 && (balance + overdraftLimit) >= totalDebit) {
-            balance -= totalDebit;
-            cout << "Withdrawn: Rs. " << amount << " (Fee: Rs. " << transactionFee << ")" << endl;
-            cout << "Remaining Balance: Rs. " << balance << endl;
-        } else {
-            cout << "Withdrawal exceeds overdraft limit!" << endl;
-        }
+    CheckingAccount(string name, int accNo, double initBalance, double f)
+        : Account(name, accNo, initBalance) {
+        fee = f;
     }
 
-    void display() const {
-        Account::display();
-        cout << "Account Type: Checking Account" << endl;
-        cout << "Overdraft Limit: Rs. " << overdraftLimit << endl;
-        cout << "Transaction Fee per Withdrawal: Rs. " << transactionFee << endl;
+    void withdraw(double amount) {
+        double total = amount + fee;
+        if (total <= balance) {
+            balance -= total;
+            cout << "Withdrawn: " << amount << " (Fee: " << fee << "). Balance: " << balance << endl;
+        } else {
+            cout << "Insufficient balance including fee!" << endl;
+        }
     }
 };
 
 int main() {
-    cout << "=== SAVINGS ACCOUNT DEMO ===" << endl;
-    SavingAccount sa("Sanskar Dhat", 1001, 5000.0, 5.0);
+    SavingAccount sa("Sanskar", 101, 5000, 5);
     sa.display();
-    sa.deposit(1500.0);
-    sa.withdraw(2000.0);
+    sa.deposit(1000);
     sa.calculateInterest();
 
-    cout << "\n=== CHECKING ACCOUNT DEMO ===" << endl;
-    CheckingAccount ca("Sanskar Dhat", 2001, 3000.0, 1000.0, 20.0);
+    cout << endl;
+
+    CheckingAccount ca("Sanskar", 102, 3000, 20);
     ca.display();
-    ca.deposit(2000.0);
-    ca.withdraw(4500.0);
-    ca.withdraw(2000.0); // Test overdraft limit breach
+    ca.withdraw(500);
 
     return 0;
 }
